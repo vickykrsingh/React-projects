@@ -4,11 +4,10 @@ import {
   FaFileCirclePlus,
   FaFolder,
   FaFolderPlus,
-  FaLeaf,
 } from "react-icons/fa6";
 import { IoIosArrowDown } from "react-icons/io";
 
-function Folder({ explorer }) {
+function Folder({ explorer,handleInsertNode }) {
   const [expand, setExpand] = useState(false);
   const [showInput, setShowInput] = useState({
     visiable: false,
@@ -22,8 +21,14 @@ function Folder({ explorer }) {
       isFolder: isFolder,
     });
     setExpand(true)
-    console.log("new folder");
   };
+
+  const onAddFolder = (e) => {
+    if(e.keyCode === 13 && e.target.value){
+      handleInsertNode(explorer.id,e.target.value,showInput.isFolder)
+      setShowInput({...showInput,visiable:false})
+    }
+  }
 
   return (
     <main>
@@ -43,7 +48,8 @@ function Folder({ explorer }) {
           {explorer.isFolder ? <FaFolder /> : <FaFile />}
           {explorer.name}
         </div>
-        <div style={{ display: "flex", gap: "2px" }}>
+        {
+          explorer.isFolder && <div style={{ display: "flex", gap: "2px" }}>
           <button onClick={(e) => handleNewFolder(e, true)}>
             <FaFolderPlus />
           </button>
@@ -52,17 +58,18 @@ function Folder({ explorer }) {
           </button>
           <div>{explorer.isFolder && <IoIosArrowDown />}</div>
         </div>
+        }
       </section>
       {showInput.visiable && (
         <div style={{display:'flex',gap:'5px',alignItems:'center',width:'295px',paddingLeft:'25px'}}>
           {showInput.isFolder ? <FaFolder style={{fontSize:'20px'}} /> : <FaFile style={{fontSize:'20px'}}/>}
-          <input style={{width:'100%',height:'20px',outline:'none'}} autoFocus onBlur={()=>setShowInput({...showInput,visiable:false})} />
+          <input style={{width:'100%',height:'20px',outline:'none'}} autoFocus onBlur={()=>setShowInput({...showInput,visiable:false})} onKeyDown={(e)=>onAddFolder(e)} />
         </div>
       )}
       {expand && (
         <section style={{ paddingLeft: "25px", marginTop: "1px" }}>
           {explorer.items.map((exp) => {
-            return <Folder explorer={exp} key={exp.id} />;
+            return <Folder explorer={exp} handleInsertNode={handleInsertNode} key={exp.id} />;
           })}
         </section>
       )}
